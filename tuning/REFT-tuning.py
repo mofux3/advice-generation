@@ -5,10 +5,13 @@ import pyreft
 from colorama import init, Fore
 
 # Initialize Colorama for colored output
+# 色付きの出力のためにColoramaを初期化
 init()
 
-# Function to load pretrained model
+# プリトレーニング済みモデルを読み込む関数
 def load_pretrained_model():
+    # Function to load pretrained model
+    # プリトレーニング済みモデルを読み込む関数
     model_name = 'meta-llama/Llama-2-7b-chat-hf'
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -19,8 +22,10 @@ def load_pretrained_model():
     )
     return model
 
-# Function to load tokenizer
+# トークナイザを読み込む関数
 def load_tokenizer(model_name):
+    # Function to load tokenizer
+    # トークナイザを読み込む関数
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_name,
         model_max_tokens=2048,
@@ -31,8 +36,10 @@ def load_tokenizer(model_name):
     tokenizer.pad_token = tokenizer.unk_token
     return tokenizer
 
-# Define Prompt Template
+# プロンプトテンプレートを定義する関数
 def prompt_template(prompt):
+    # Define Prompt Template
+    # プロンプトのテンプレートを定義する
     return f"""<s>[INST]<<sys>>You are an assistant with high knowledge in civil engineering. You will create reports 
     based on pavements cracks and other defects detected on the street. You will create a report that includes the following:
     The kind of defect in question, what the consequences will be in 1 year if nothing is done, and the recommended 
@@ -40,14 +47,16 @@ def prompt_template(prompt):
         {prompt}
         [/INST]"""
 
-# Function to load and train the model
+# モデルを読み込み、トレーニングする関数
 def load_and_train_model(model, tokenizer):
     # Load Data
-    df = pd.read_csv('data/supercool.csv')
+    # データを読み込む
+    df = pd.read_csv('your_dataset')
     X = df['target'].values
     y = df['goal'].values
 
     # Reft Configuration
+    # Reftの設定
     reft_config = pyreft.ReftConfig(
         representations={
             "layer": 15,
@@ -60,10 +69,12 @@ def load_and_train_model(model, tokenizer):
     )
 
     # Initialize Reft Model
+    # Reftモデルの初期化
     reft_model = pyreft.get_reft_model(model, reft_config)
     reft_model.set_device(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
     # Prepare Data Module
+    # データモジュールを準備する
     data_module = pyreft.make_last_position_supervised_data_module(
         tokenizer,
         model,
@@ -72,6 +83,7 @@ def load_and_train_model(model, tokenizer):
     )
 
     # Training Arguments
+    # トレーニングの引数
     training_arguments = transformers.TrainingArguments(
         num_train_epochs=10,
         output_dir='./models',
@@ -81,6 +93,7 @@ def load_and_train_model(model, tokenizer):
     )
 
     # Reft Trainer
+    # Reftトレーナー
     trainer = pyreft.ReftTrainerForCausalLM(
         model=reft_model,
         tokenizer=tokenizer,
@@ -89,22 +102,31 @@ def load_and_train_model(model, tokenizer):
     )
 
     # Train the Model
+    # モデルをトレーニングする
     trainer.train()
 
     # Save the Model
+    # モデルを保存する
     reft_model.set_device('cpu')
     reft_model.save(save_directory='./rude')
 
 # Main Function
+# メイン関数
 if __name__ == "__main__":
     print("Loading pretrained model...")
+    # プリトレーニング済みモデルを読み込んでいます...
     model = load_pretrained_model()
     print("Pretrained model loaded.")
+    # プリトレーニング済みモデルを読み込みました.
 
     print("Loading tokenizer...")
+    # トークナイザを読み込んでいます...
     tokenizer = load_tokenizer('meta-llama/Llama-2-7b-chat-hf')
     print("Tokenizer loaded.")
+    # トークナイザを読み込みました.
 
     print("Models and data loaded. Starting training...")
+    # モデルとデータが読み込まれました。トレーニングを開始します...
     load_and_train_model(model, tokenizer)
     print("Training completed. Model saved.")
+    # トレーニングが完了しました。モデルが保存されました.
