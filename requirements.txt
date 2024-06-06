@@ -1,0 +1,13 @@
+streamlit
+transformers
+torch
+git+https://github.com/stanfordnlp/pyreft.git
+colorama
+huggingface_hub
+langchain
+einops
+accelerate
+bitsandbytes
+scipy
+llama-index==0.7.21
+llama_hub==0.0.19
