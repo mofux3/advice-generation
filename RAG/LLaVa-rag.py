@@ -9,7 +9,7 @@ from llama_index.prompts.prompts import SimpleInputPrompt
 
 # Set up LLAVA configuration
 name = "llava-hf/llava-v1.6-mistral-7b-hf"
-auth_token = "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"
+auth_token = ""
 
 
 # Function to retrieve LLAVA model and processor
@@ -81,10 +81,10 @@ set_global_service_context(service_context)
 st.title('LLaVA: Pavement Defect Identification and Classification')
 
 # File uploader for images
-uploaded_image = st.file_uploader("Upload an image of the pavement defect", type=["png", "jpg", "jpeg"])
+uploaded_image = st.file_uploader("Upload an image of the pavement defect. Accepted types: png, jpg, jpeg", type=["png", "jpg", "jpeg"])
 
 # Text input for defect description
-prompt = st.text_input('Enter a textual description of the defect')
+prompt = st.text_input('Enter Description of image')
 
 
 # Function to process image and text using LLAVA
@@ -105,9 +105,9 @@ def process_image_and_text(image, prompt):
 # Display results
 if st.button('Generate Report'):
     if uploaded_image is None:
-        st.warning("Please upload an image.")
+        st.warning("UPload image")
     elif not prompt:
-        st.warning("Please enter a textual description.")
+        st.warning("Text description of image in any form. .")
     else:
         response = process_image_and_text(uploaded_image, prompt)
         st.subheader("Generated Report:")
